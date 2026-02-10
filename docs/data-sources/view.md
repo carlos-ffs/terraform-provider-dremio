@@ -32,20 +32,39 @@ data "dremio_view" "by_id" {
 
 ### Optional (One Required)
 
-- `id` (String) - UUID of the view. Either `id` or `path` must be specified.
-- `path` (List of String) - Full path to the view. Either `id` or `path` must be specified.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the view. Either `id` or `path` must be specified. |
+| `path` | List of String | Full path to the view, including the source/space name. Either `id` or `path` must be specified. |
 
 ### Read-Only
 
-- `entity_type` (String) - Type of catalog object (always `dataset`).
-- `type` (String) - Dataset type (always `VIRTUAL_DATASET`).
-- `sql` (String) - SQL query defining the view.
-- `sql_context` (List of String) - Default schema context for the SQL.
-- `tag` (String) - Version tag for the view.
-- `fields` (String, JSON) - JSON representation of view fields with names and types.
-- `access_control_list` (Object) - ACL settings.
-  - `users` (List of Object) - User access controls.
-  - `roles` (List of Object) - Role access controls.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `entity_type` | String | Type of catalog object (always `dataset`). |
+| `type` | String | Dataset type (always `VIRTUAL_DATASET`). |
+| `sql` | String | SQL query defining the view. |
+| `sql_context` | List of String | Default schema context for the SQL query. |
+| `tag` | String | Version tag for optimistic concurrency control. |
+| `fields` | String (JSON) | JSON representation of the view's field schema, including column names and data types. Use `jsondecode()` to parse this value. |
+
+#### access_control_list (Object)
+
+User and role access settings.
+
+**users** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the user. |
+| `permissions` | List of String | List of permissions granted. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the role. |
+| `permissions` | List of String | List of permissions granted. |
 
 ## Notes
 

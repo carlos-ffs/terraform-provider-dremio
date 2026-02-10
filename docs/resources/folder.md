@@ -30,23 +30,37 @@ resource "dremio_folder" "nested" {
 
 ### Required
 
-- `path` (List of String) - Full path to the folder, including the source or space name. Each element represents a level in the hierarchy. Path elements must not contain the characters: `/`, `:`, `[`, `]`.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `path` | List of String | Full path to the folder, including the source or space name. Each element represents a level in the hierarchy. Path elements must not contain: `/`, `:`, `[`, `]`. |
 
 ### Optional
 
-- `access_control_list` (Block) - User and role access settings. Can only be set via update (not on initial creation).
-  - `users` (Block List) - List of user access controls.
-    - `id` (String) - User ID.
-    - `permissions` (List of String) - List of permissions.
-  - `roles` (Block List) - List of role access controls.
-    - `id` (String) - Role ID.
-    - `permissions` (List of String) - List of permissions.
+#### access_control_list (Block)
+
+User and role access settings. Can only be set via update (not on initial creation).
+
+**users** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the user. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the role. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
 
 ### Read-Only
 
-- `id` (String) - Unique identifier of the folder.
-- `entity_type` (String) - Type of catalog object (always `folder`).
-- `tag` (String) - Version tag for optimistic concurrency control.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Unique identifier of the folder (UUID). |
+| `entity_type` | String | Type of catalog object (always `folder`). |
+| `tag` | String | Version tag for optimistic concurrency control. This value changes with every update. |
 
 ## Import
 

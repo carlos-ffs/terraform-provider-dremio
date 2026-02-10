@@ -27,15 +27,25 @@ resource "dremio_grants" "source_access" {
 
 ### Required
 
-- `catalog_object_id` (String) - UUID of the catalog object (source, folder, dataset, etc.) to manage grants for.
-- `grants` (Set of Object) - Set of grants to apply. Each grant specifies a user or role and their privileges.
-  - `id` (String) - UUID of the user or role.
-  - `grantee_type` (String) - Type of grantee. Valid values: `USER`, `ROLE`.
-  - `privileges` (Set of String) - Set of privileges to grant.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `catalog_object_id` | String | UUID of the catalog object (source, folder, dataset, etc.) to manage grants for. |
+
+#### grants (Set of Object) - Required
+
+Set of grants to apply to the catalog object. If empty, all explicit grants will be removed from the object.
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the user or role to grant privileges to. |
+| `grantee_type` | String | Yes | Type of grantee. Valid values: `USER`, `ROLE`. |
+| `privileges` | Set of String | Yes | Set of privileges to grant. Available privileges depend on the catalog object type. See Available Privileges below. |
 
 ### Read-Only
 
-- `available_privileges` (List of String) - List of privileges that can be granted on this object type.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `available_privileges` | List of String | List of available privileges for this catalog object type. This is computed from the API response. |
 
 ## Import
 

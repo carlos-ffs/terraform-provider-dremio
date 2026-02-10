@@ -29,49 +29,74 @@ resource "dremio_table" "nyc_trips" {
 
 ### Required
 
-- `path` (List of String) - Full path to the table, including the source name. Each element represents a level in the hierarchy.
-- `file_or_folder_id` (String) - The ID of the file or folder to promote. Use the `dremio_file` data source to look up file IDs by path.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `path` | List of String | Full path to the table, including the source name. Each element represents a level in the hierarchy. Path elements must not contain: `/`, `:`, `[`, `]`. |
+| `file_or_folder_id` | String | Unique identifier of the source file or folder to format as a table. Use the `dremio_file` data source to look up file IDs by path. |
+| `format` | Block | Format configuration for the promoted table. See format block below. |
 
 ### Optional
 
-- `format` (Block) - Format configuration for the promoted table.
-  - `type` (String) - Type of data. Valid values: `Delta`, `Excel`, `Iceberg`, `JSON`, `Parquet`, `Text`, `Unknown`, `XLS`.
-  - `ignore_other_file_formats` (Boolean) - For Parquet folders, ignore non-Parquet files.
-  - `skip_first_line` (Boolean) - Skip first line when creating table (Excel/Text).
-  - `extract_header` (Boolean) - Extract column names from first line (Excel/Text).
-  - `has_merged_cells` (Boolean) - Expand merged cells (Excel).
-  - `sheet_name` (String) - Sheet name for Excel files with multiple sheets.
-  - `field_delimiter` (String) - Field delimiter character (Text). Default: `,`.
-  - `quote` (String) - Quote character (Text). Default: `"`.
-  - `comment` (String) - Comment character (Text). Default: `#`.
-  - `escape` (String) - Escape character (Text). Default: `"`.
-  - `line_delimiter` (String) - Line delimiter character (Text). Default: `\n`.
-  - `auto_generate_column_names` (Boolean) - Auto-generate column names (Text).
-  - `trim_header` (Boolean) - Trim header whitespace (Text).
+#### format (Block) - Required
 
-- `acceleration_refresh_policy` (Block) - Acceleration refresh policy for the table.
-  - `active_policy_type` (String) - Policy for refreshing Reflections. Valid values: `NEVER`, `PERIOD`, `SCHEDULE`, `REFRESH_ON_DATA_CHANGES`.
-  - `refresh_period_ms` (Number) - Refresh period in milliseconds. Minimum: 3600000 (1 hour).
-  - `refresh_schedule` (String) - Cron expression for refresh schedule (UTC). Example: `0 0 8 * * ?`.
-  - `grace_period_ms` (Number) - Maximum age for Reflection data in milliseconds.
-  - `method` (String) - Method for refreshing Reflections. Valid values: `AUTO`, `FULL`, `INCREMENTAL`.
-  - `refresh_field` (String) - Field to use for incremental refresh.
-  - `never_expire` (Boolean) - Whether Reflections never expire.
+Defines the file format configuration when promoting files to tables.
 
-- `access_control_list` (Block) - User and role access settings.
-  - `users` (Block List) - List of user access controls.
-    - `id` (String) - User ID.
-    - `permissions` (List of String) - List of permissions.
-  - `roles` (Block List) - List of role access controls.
-    - `id` (String) - Role ID.
-    - `permissions` (List of String) - List of permissions.
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `type` | String | **Required** | Type of data. Valid values: `Delta`, `Excel`, `Iceberg`, `JSON`, `Parquet`, `Text`, `Unknown`, `XLS`. |
+| `ignore_other_file_formats` | Boolean | `false` | For Parquet folders, ignore non-Parquet files. |
+| `skip_first_line` | Boolean | `false` | Skip first line when creating table (Excel/Text). |
+| `extract_header` | Boolean | `false` | Extract column names from first line (Excel/Text). |
+| `has_merged_cells` | Boolean | `false` | Expand merged cells (Excel). |
+| `sheet_name` | String | `null` | Sheet name for Excel files with multiple sheets. |
+| `field_delimiter` | String | `,` | Field delimiter character (Text). Common values: `,` (CSV), `\t` (TSV), `\|` (pipe). |
+| `quote` | String | `"` | Quote character (Text). |
+| `comment` | String | `#` | Comment character (Text). |
+| `escape` | String | `"` | Escape character (Text). |
+| `line_delimiter` | String | `\r\n` | Line delimiter (Text). |
+| `auto_generate_column_names` | Boolean | `false` | Auto-generate column names if no header (Text). |
+| `trim_header` | Boolean | `false` | Trim whitespace from column names (Text). |
+
+#### acceleration_refresh_policy (Block)
+
+Defines the acceleration (Reflection) refresh policy for the table.
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `active_policy_type` | String | `PERIOD` | Policy for refreshing Reflections. Valid values: `NEVER`, `PERIOD`, `SCHEDULE`, `REFRESH_ON_DATA_CHANGES`. |
+| `refresh_period_ms` | Number | `3600000` | Refresh period in milliseconds. Minimum: 3600000 (1 hour). |
+| `refresh_schedule` | String | `null` | Cron expression for refresh schedule (UTC). Example: `0 0 8 * * ?` (daily at 8 AM UTC). |
+| `grace_period_ms` | Number | `null` | Maximum age for Reflection data in milliseconds before it's considered stale. |
+| `method` | String | `AUTO` | Method for refreshing Reflections. Valid values: `AUTO` (Dremio decides), `FULL` (complete refresh), `INCREMENTAL` (only new data). |
+| `refresh_field` | String | `null` | Field to use for incremental refresh. Required when `method` is `INCREMENTAL`. |
+| `never_expire` | Boolean | `false` | Whether Reflections never expire. |
+
+#### access_control_list (Block)
+
+User and role access settings.
+
+**users** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the user. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the role. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
 
 ### Read-Only
 
-- `id` (String) - Unique identifier of the table.
-- `entity_type` (String) - Type of catalog object.
-- `type` (String) - Dataset type (always `PHYSICAL_DATASET`).
-- `tag` (String) - Version tag for optimistic concurrency control.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Unique identifier of the table (UUID). |
+| `entity_type` | String | Type of catalog object (always `dataset`). |
+| `type` | String | Dataset type (always `PHYSICAL_DATASET`). |
+| `tag` | String | Version tag for optimistic concurrency control. This value changes with every update. |
 
 ## Import
 

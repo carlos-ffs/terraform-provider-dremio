@@ -18,12 +18,16 @@ output "tags" {
 
 ### Required
 
-- `dataset_id` (String) - UUID of the dataset to retrieve tags for.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `dataset_id` | String | UUID of the dataset to retrieve tags for. |
 
 ### Read-Only
 
-- `tags` (List of String) - List of tags applied to the dataset.
-- `version` (String) - Version identifier for the tags.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `tags` | List of String | List of tags applied to the dataset. Tags are case-insensitive labels used for organization and discovery. |
+| `version` | String | Version identifier for the current set of tags. Used for optimistic concurrency control. |
 
 ## Notes
 

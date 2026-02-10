@@ -28,34 +28,84 @@ data "dremio_source" "by_id" {
 
 ### Optional (One Required)
 
-- `id` (String) - UUID of the source. Either `id` or `name` must be specified.
-- `name` (String) - Name of the source. Either `id` or `name` must be specified.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the source. Either `id` or `name` must be specified. |
+| `name` | String | Name of the source. Either `id` or `name` must be specified. |
 
 ### Read-Only
 
-- `entity_type` (String) - Type of catalog object (always `source`).
-- `type` (String) - The source type (e.g., `S3`, `MYSQL`, `POSTGRES`).
-- `config` (String, JSON) - Source configuration as a JSON string.
-- `tag` (String) - Version tag for the source.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `type` | String | Source type (e.g., `ARCTIC`, `S3`, `SNOWFLAKE`, `MYSQL`, `POSTGRES`, etc.). |
+| `config` | String (JSON) | Configuration options specific to the source type as a JSON string. |
+| `tag` | String | Version tag for optimistic concurrency control. |
+| `permissions` | List of String | User's permissions on the source. |
 
-- `metadata_policy` (Object) - Metadata refresh policy.
-  - `auth_ttl_ms` (Number) - Auth TTL in milliseconds.
-  - `names_refresh_ms` (Number) - Names refresh interval.
-  - `dataset_refresh_after_ms` (Number) - Dataset refresh interval.
-  - `dataset_expire_after_ms` (Number) - Dataset expiration time.
-  - `dataset_update_mode` (String) - Update mode.
-  - `delete_unavailable_datasets` (Boolean) - Delete unavailable datasets.
-  - `auto_promote_datasets` (Boolean) - Auto-promote datasets.
+#### metadata_policy (Object)
 
-- `acceleration_grace_period_ms` (Number) - Acceleration grace period.
-- `acceleration_refresh_period_ms` (Number) - Acceleration refresh period.
-- `acceleration_active_policy_type` (String) - Active policy type.
-- `acceleration_refresh_schedule` (String) - Refresh schedule (cron).
-- `acceleration_refresh_on_data_changes` (Boolean) - Refresh on data changes.
+Metadata refresh policy settings.
 
-- `access_control_list` (Object) - ACL settings.
-  - `users` (List of Object) - User access controls.
-  - `roles` (List of Object) - Role access controls.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `auth_ttl_ms` | Number | How long source permissions are cached (milliseconds). |
+| `names_refresh_ms` | Number | When to run a refresh of the source namespace (milliseconds). |
+| `dataset_refresh_after_ms` | Number | How often the dataset metadata is refreshed (milliseconds). |
+| `dataset_expire_after_ms` | Number | Time before metadata expires (milliseconds). |
+| `dataset_update_mode` | String | Metadata policy for dataset updates (`PREFETCH`, `PREFETCH_QUERIED`, `INLINE`). |
+| `delete_unavailable_datasets` | Boolean | Remove dataset definitions if underlying data is unavailable. |
+| `auto_promote_datasets` | Boolean | Automatically format files into tables when queried. |
+
+#### Acceleration Settings
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `acceleration_grace_period_ms` | Number | Grace period before using Reflections (milliseconds). |
+| `acceleration_refresh_period_ms` | Number | Refresh period for Reflections (milliseconds). |
+| `acceleration_never_expire` | Boolean | Whether Reflections never expire. |
+| `acceleration_never_refresh` | Boolean | Whether Reflections never refresh. |
+| `acceleration_active_policy_type` | String | Active policy type (`PERIOD` or `NEVER`). |
+| `acceleration_refresh_schedule` | String | Cron expression for refresh schedule. |
+
+#### children (List of Object)
+
+Child entities in the source (folders, datasets, etc.).
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Unique identifier of the entity. |
+| `path` | List of String | Full path to the entity. |
+| `tag` | String | Version tag. |
+| `type` | String | Entity type (`CONTAINER` or `DATASET`). |
+| `container_type` | String | Container type (`SPACE`, `SOURCE`, `FOLDER`, `HOME`). |
+| `dataset_type` | String | Dataset type (`VIRTUAL_DATASET` or `PHYSICAL_DATASET`). |
+
+#### owner (Object)
+
+Owner information for the source.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `owner_id` | String | UUID of the owner. |
+| `owner_type` | String | Owner type (`USER` or `ROLE`). |
+
+#### access_control_list (Object)
+
+User and role access settings.
+
+**users** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the user. |
+| `permissions` | List of String | List of permissions granted. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the role. |
+| `permissions` | List of String | List of permissions granted. |
 
 ## Notes
 

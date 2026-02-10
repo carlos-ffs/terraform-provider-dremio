@@ -28,20 +28,35 @@ data "dremio_folder" "by_id" {
 
 ### Optional (One Required)
 
-- `id` (String) - UUID of the folder. Either `id` or `path` must be specified.
-- `path` (List of String) - Full path to the folder. Either `id` or `path` must be specified.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the folder. Either `id` or `path` must be specified. |
+| `path` | List of String | Full path to the folder, including the source/space name. Either `id` or `path` must be specified. |
 
 ### Read-Only
 
-- `entity_type` (String) - Type of catalog object (always `folder`).
-- `tag` (String) - Version tag for the folder.
-- `access_control_list` (Object) - ACL settings.
-  - `users` (List of Object) - User access controls.
-    - `id` (String) - User ID.
-    - `permissions` (List of String) - Permissions.
-  - `roles` (List of Object) - Role access controls.
-    - `id` (String) - Role ID.
-    - `permissions` (List of String) - Permissions.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `entity_type` | String | Type of catalog object (always `folder`). |
+| `tag` | String | Version tag for optimistic concurrency control. |
+
+#### access_control_list (Object)
+
+User and role access settings.
+
+**users** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the user. |
+| `permissions` | List of String | List of permissions granted. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the role. |
+| `permissions` | List of String | List of permissions granted. |
 
 ## Notes
 

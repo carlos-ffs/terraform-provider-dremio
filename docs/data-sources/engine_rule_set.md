@@ -23,21 +23,33 @@ output "default_rule" {
 
 ### Read-Only
 
-- `rule_infos` (List of Object) - Ordered list of routing rules.
-  - `name` (String) - Rule name.
-  - `condition` (String) - SQL-like condition for matching.
-  - `engine_name` (String) - Target engine name.
-  - `action` (String) - Action (`ROUTE` or `REJECT`).
-  - `reject_message` (String) - Message for rejected queries.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `tag` | String | UUID of a tag that routes JDBC queries to a particular session. |
 
-- `rule_info_default` (Object) - The default rule.
-  - `name` (String) - Default rule name.
-  - `condition` (String) - Default condition.
-  - `engine_name` (String) - Default engine name.
-  - `action` (String) - Always `ROUTE`.
-  - `reject_message` (String) - Not applicable.
+#### rule_infos (List of Object)
 
-- `tag` (String) - Version tag for optimistic concurrency control.
+Ordered list of routing rules. Rules are evaluated in order; first match wins.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `name` | String | User-defined name for the rule. |
+| `condition` | String | Routing condition using SQL syntax (e.g., `role_name = 'analysts'`). |
+| `engine_name` | String | Name of the engine to route jobs to. |
+| `action` | String | Rule type. Values: `ROUTE` or `REJECT`. |
+| `reject_message` | String | Message displayed to the user if the rule rejects jobs. |
+
+#### rule_info_default (Object)
+
+The default rule that applies to jobs without a matching rule.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `name` | String | User-defined name for the default rule. |
+| `condition` | String | Routing condition (typically empty for default). |
+| `engine_name` | String | Name of the default engine to route jobs to. |
+| `action` | String | Always `ROUTE` for the default rule. |
+| `reject_message` | String | Not applicable for default rule. |
 
 ## Notes
 

@@ -24,30 +24,36 @@ resource "dremio_engine" "analytics" {
 
 ### Required
 
-- `name` (String) - Name of the engine. Must be unique within the project.
-- `size` (String) - Engine size. Valid values: `XX_SMALL_V1`, `X_SMALL_V1`, `SMALL_V1`, `MEDIUM_V1`, `LARGE_V1`, `X_LARGE_V1`, `XX_LARGE_V1`, `XXX_LARGE_V1`.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `name` | String | User-defined name for the engine. Must be unique within the project. |
+| `size` | String | Size of the engine. Valid values: `XX_SMALL_V1`, `X_SMALL_V1`, `SMALL_V1`, `MEDIUM_V1`, `LARGE_V1`, `X_LARGE_V1`, `XX_LARGE_V1`, `XXX_LARGE_V1`. |
+| `min_replicas` | Number | Minimum number of engine replicas that will be enabled at any given time. |
+| `max_replicas` | Number | Maximum number of engine replicas that will be enabled at any given time. |
+| `auto_stop_delay_seconds` | Number | Time (in seconds) that auto-stop is delayed after the last query completes. |
+| `queue_time_limit_seconds` | Number | Maximum time (in seconds) a query will wait in the engine's queue before being canceled. Should be >= 120 seconds. |
+| `runtime_limit_seconds` | Number | Maximum time (in seconds) a query can run before being terminated. Set to 0 for no limit. |
+| `drain_time_limit_seconds` | Number | Maximum time (in seconds) an engine replica will continue to run after resize/disable/delete before termination. |
+| `max_concurrency` | Number | Maximum number of concurrent queries that an engine replica can run. |
 
 ### Optional
 
-- `min_replicas` (Number) - Minimum number of engine replicas. Default: 0.
-- `max_replicas` (Number) - Maximum number of engine replicas.
-- `auto_stop_delay_seconds` (Number) - Seconds of inactivity before auto-stopping. Default: 3600 (1 hour).
-- `queue_time_limit_seconds` (Number) - Maximum seconds a query can wait in queue.
-- `runtime_limit_seconds` (Number) - Maximum seconds a query can run.
-- `drain_time_limit_seconds` (Number) - Seconds to wait for queries to complete before scaling down.
-- `max_concurrency` (Number) - Maximum concurrent queries per replica.
-- `description` (String) - Human-readable description of the engine.
-- `enable` (Boolean) - Whether the engine is enabled. Default: true.
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `description` | String | `null` | Human-readable description for the engine. |
+| `enable` | Boolean | `true` | Whether the engine is enabled. Set to `false` to disable the engine. |
 
 ### Read-Only
 
-- `id` (String) - Unique identifier of the engine.
-- `state` (String) - Current engine state. Values: `DELETING`, `DISABLED`, `DISABLING`, `ENABLED`, `ENABLING`, `INVALID`.
-- `active_replicas` (Number) - Current number of running replicas.
-- `queried_at` (String) - Timestamp of the last query.
-- `status_changed_at` (String) - Timestamp of the last status change.
-- `instance_family` (String) - Cloud instance family used.
-- `additional_engine_state_info` (String) - Additional state information.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Unique identifier of the engine (UUID). |
+| `state` | String | Current state of the engine. Values: `DELETING`, `DISABLED`, `DISABLING`, `ENABLED`, `ENABLING`, `INVALID`. |
+| `active_replicas` | Number | Number of engine replicas currently active. |
+| `queried_at` | String | Date and time (ISO 8601) the engine was last used to execute a query. |
+| `status_changed_at` | String | Date and time (UTC) that the state of the engine changed. |
+| `instance_family` | String | Cloud instance family used (e.g., `M5D`, `M6ID`, `M6GD`, `DDV4`, `DDV5`). |
+| `additional_engine_state_info` | String | Additional engine state information (typically `NONE`). |
 
 ## Import
 

@@ -26,15 +26,18 @@ data "dremio_file" "by_id" {
 
 ## Schema
 
-### Optional (One Required)
+### Required
 
-- `id` (String) - UUID of the file. Either `id` or `path` must be specified.
-- `path` (List of String) - Full path to the file. Either `id` or `path` must be specified.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `path` | List of String | Full path to the file, including the source name. Path elements must not contain the characters: `/`, `:`, `[`, `]`. |
 
 ### Read-Only
 
-- `entity_type` (String) - Type of catalog object (always `file`).
-- `tag` (String) - Version tag for the file.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Unique identifier of the file. |
+| `entity_type` | String | Type of catalog object (always `file`). |
 
 ## Notes
 

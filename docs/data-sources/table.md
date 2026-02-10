@@ -32,40 +32,70 @@ data "dremio_table" "by_id" {
 
 ### Optional (One Required)
 
-- `id` (String) - UUID of the table. Either `id` or `path` must be specified.
-- `path` (List of String) - Full path to the table. Either `id` or `path` must be specified.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the table. Either `id` or `path` must be specified. |
+| `path` | List of String | Full path to the table, including the source name. Either `id` or `path` must be specified. |
 
 ### Read-Only
 
-- `entity_type` (String) - Type of catalog object.
-- `type` (String) - Dataset type (always `PHYSICAL_DATASET`).
-- `tag` (String) - Version tag for the table.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `entity_type` | String | Type of catalog object (always `dataset`). |
+| `type` | String | Dataset type (always `PHYSICAL_DATASET`). |
+| `tag` | String | Version tag for optimistic concurrency control. |
 
-- `format` (Object) - Format configuration of the table.
-  - `type` (String) - Format type (Text, Parquet, JSON, etc.).
-  - `field_delimiter` (String) - Field delimiter (Text).
-  - `skip_first_line` (Boolean) - Skip first line.
-  - `extract_header` (Boolean) - Extract header.
-  - `trim_header` (Boolean) - Trim header whitespace.
-  - `quote` (String) - Quote character.
-  - `comment` (String) - Comment character.
-  - `escape` (String) - Escape character.
-  - `line_delimiter` (String) - Line delimiter.
-  - `ignore_other_file_formats` (Boolean) - Ignore non-matching files.
-  - `sheet_name` (String) - Excel sheet name.
-  - `has_merged_cells` (Boolean) - Has merged cells (Excel).
-  - `auto_generate_column_names` (Boolean) - Auto-generate column names.
+#### format (Object)
 
-- `acceleration_refresh_policy` (Object) - Acceleration settings.
-  - `active_policy_type` (String) - Policy type.
-  - `refresh_period_ms` (Number) - Refresh period.
-  - `refresh_schedule` (String) - Refresh schedule (cron).
-  - `grace_period_ms` (Number) - Grace period.
-  - `method` (String) - Refresh method.
-  - `refresh_field` (String) - Incremental refresh field.
-  - `never_expire` (Boolean) - Never expire.
+Format configuration of the promoted table.
 
-- `access_control_list` (Object) - ACL settings.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `type` | String | Format type. Values: `Text`, `Parquet`, `JSON`, `Delta`, `Iceberg`, `Excel`, `XLS`, `Unknown`. |
+| `field_delimiter` | String | Field delimiter character (Text). |
+| `quote` | String | Quote character (Text). |
+| `comment` | String | Comment character (Text). |
+| `escape` | String | Escape character (Text). |
+| `line_delimiter` | String | Line delimiter (Text). |
+| `skip_first_line` | Boolean | Skip first line when reading (Excel/Text). |
+| `extract_header` | Boolean | Extract column names from first line (Excel/Text). |
+| `trim_header` | Boolean | Trim whitespace from column names (Text). |
+| `ignore_other_file_formats` | Boolean | For Parquet folders, ignore non-Parquet files. |
+| `sheet_name` | String | Sheet name for Excel files with multiple sheets. |
+| `has_merged_cells` | Boolean | Expand merged cells (Excel). |
+| `auto_generate_column_names` | Boolean | Auto-generate column names if no header (Text). |
+
+#### acceleration_refresh_policy (Object)
+
+Acceleration (Reflection) refresh policy for the table.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `active_policy_type` | String | Policy type. Values: `NEVER`, `PERIOD`, `SCHEDULE`, `REFRESH_ON_DATA_CHANGES`. |
+| `refresh_period_ms` | Number | Refresh period in milliseconds. |
+| `refresh_schedule` | String | Cron expression for refresh schedule (UTC). |
+| `grace_period_ms` | Number | Maximum age for Reflection data in milliseconds. |
+| `method` | String | Refresh method. Values: `AUTO`, `FULL`, `INCREMENTAL`. |
+| `refresh_field` | String | Field to use for incremental refresh. |
+| `never_expire` | Boolean | Whether Reflections never expire. |
+
+#### access_control_list (Object)
+
+User and role access settings.
+
+**users** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the user. |
+| `permissions` | List of String | List of permissions granted. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | UUID of the role. |
+| `permissions` | List of String | List of permissions granted. |
 
 ## Notes
 

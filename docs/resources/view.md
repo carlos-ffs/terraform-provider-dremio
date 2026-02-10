@@ -22,28 +22,44 @@ resource "dremio_view" "nyc_trips" {
 
 ### Required
 
-- `path` (List of String) - Full path to the view, including the source/space name and folder hierarchy. The last element is the view name. Path elements must not contain: `/`, `:`, `[`, `]`.
-- `sql` (String) - SQL query defining the view.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `path` | List of String | Full path to the view, including the source/space name and folder hierarchy. The last element is the view name. Path elements must not contain: `/`, `:`, `[`, `]`. |
+| `sql` | String | SQL query defining the view. |
 
 ### Optional
 
-- `sql_context` (List of String) - Default schema context for the SQL query. Objects referenced without full paths are resolved relative to this context.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `sql_context` | List of String | Default schema context for the SQL query. Objects referenced without full paths are resolved relative to this context. |
 
-- `access_control_list` (Block) - User and role access settings.
-  - `users` (Block List) - List of user access controls.
-    - `id` (String) - User ID.
-    - `permissions` (List of String) - List of permissions.
-  - `roles` (Block List) - List of role access controls.
-    - `id` (String) - Role ID.
-    - `permissions` (List of String) - List of permissions.
+#### access_control_list (Block)
+
+User and role access settings.
+
+**users** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the user. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the role. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
 
 ### Read-Only
 
-- `id` (String) - Unique identifier of the view.
-- `entity_type` (String) - Type of catalog object (always `dataset`).
-- `type` (String) - Dataset type (always `VIRTUAL_DATASET`).
-- `tag` (String) - Version tag for optimistic concurrency control.
-- `fields` (String, JSON) - JSON representation of the view's field schema, including column names and data types.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Unique identifier of the view (UUID). |
+| `entity_type` | String | Type of catalog object (always `dataset`). |
+| `type` | String | Dataset type (always `VIRTUAL_DATASET`). |
+| `tag` | String | Version tag for optimistic concurrency control. This value changes with every update. |
+| `fields` | String (JSON) | JSON representation of the view's field schema, including column names and data types. Use `jsondecode()` to parse this value in Terraform configurations. |
 
 ## Import
 

@@ -18,12 +18,16 @@ output "wiki_content" {
 
 ### Required
 
-- `dataset_id` (String) - UUID of the dataset to retrieve wiki for.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `dataset_id` | String | UUID of the source, folder, or dataset to retrieve wiki for. |
 
 ### Read-Only
 
-- `text` (String) - Wiki content in GitHub-flavored Markdown.
-- `version` (String) - Version identifier for the wiki.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `text` | String | Wiki content formatted with GitHub-flavored Markdown. |
+| `version` | Number | Version number for the most recent version of the wiki, starting with 0. Used for optimistic concurrency control. |
 
 ## Notes
 

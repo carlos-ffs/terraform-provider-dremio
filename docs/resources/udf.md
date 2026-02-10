@@ -6,25 +6,11 @@ Creates and manages a User-Defined Function (UDF) in Dremio. UDFs allow you to c
 
 ```hcl
 resource "dremio_udf" "calculate_fare" {
-  path      = ["Samples", "samples.dremio.com", "terraform_top_folder", "calculate_fare"]
-  is_scalar = true
-  
-  function_arg_list = [
-    {
-      name     = "base_fare"
-      data_type = "DOUBLE"
-    },
-    {
-      name     = "tip"
-      data_type = "DOUBLE"
-    }
-  ]
-  
-  function_body = "SELECT base_fare + tip + (base_fare * 0.08)"
-  
-  return_type = {
-    data_type = "DOUBLE"
-  }
+  path              = ["Samples", "samples.dremio.com", "terraform_top_folder", "calculate_fare"]
+  is_scalar         = true
+  function_arg_list = "base_fare DOUBLE, tip DOUBLE"
+  function_body     = "SELECT base_fare + tip + (base_fare * 0.08)"
+  return_type       = "DOUBLE"
 }
 ```
 
@@ -32,31 +18,41 @@ resource "dremio_udf" "calculate_fare" {
 
 ### Required
 
-- `path` (List of String) - Full path to the UDF, including the source/space name and folder hierarchy. The last element is the function name. Path elements must not contain: `/`, `:`, `[`, `]`.
-- `is_scalar` (Boolean) - Whether the function is scalar (`true`) or tabular (`false`). Scalar functions return a single value; tabular functions return a table.
-- `function_body` (String) - SQL expression defining the function logic.
-- `return_type` (Block) - Return type specification for scalar functions.
-  - `data_type` (String) - SQL data type of the return value (e.g., `DOUBLE`, `VARCHAR`, `INT`, `BOOLEAN`).
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `path` | List of String | Full path to the UDF, including the source/space name and folder hierarchy. The last element is the function name. Path elements must not contain: `/`, `:`, `[`, `]`. |
+| `is_scalar` | Boolean | If `true`, the UDF is a scalar function (returns a single value). If `false`, the UDF is a tabular function (returns a result set). |
+| `function_arg_list` | String | The name and data type of each argument, separated by space. Multiple arguments separated by commas. Example: `"domain VARCHAR, orderdate DATE"` |
+| `function_body` | String | The SQL statement that the UDF should execute. |
+| `return_type` | String | The data type of the result (scalar) or column definitions (tabular). Examples: `"DOUBLE"` for scalar, `"name VARCHAR, email VARCHAR"` for tabular. |
 
 ### Optional
 
-- `function_arg_list` (Block List) - List of function arguments.
-  - `name` (String) - Argument name.
-  - `data_type` (String) - SQL data type of the argument.
+#### access_control_list (Block)
 
-- `access_control_list` (Block) - User and role access settings.
-  - `users` (Block List) - List of user access controls.
-    - `id` (String) - User ID.
-    - `permissions` (List of String) - List of permissions.
-  - `roles` (Block List) - List of role access controls.
-    - `id` (String) - Role ID.
-    - `permissions` (List of String) - List of permissions.
+User and role access settings.
+
+**users** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the user. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
+
+**roles** (List of Object):
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | UUID of the role. |
+| `permissions` | List of String | Yes | List of permissions to grant. |
 
 ### Read-Only
 
-- `id` (String) - Unique identifier of the UDF.
-- `entity_type` (String) - Type of catalog object (always `function`).
-- `tag` (String) - Version tag for optimistic concurrency control.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `id` | String | Unique identifier of the UDF (UUID). |
+| `entity_type` | String | Type of catalog object (always `function`). |
+| `tag` | String | Version tag for optimistic concurrency control. This value changes with every update. |
 
 ## Import
 
@@ -77,25 +73,15 @@ terraform import dremio_udf.example udf-uuid-here
 
 ```hcl
 resource "dremio_udf" "get_high_fares" {
-  path      = ["Samples", "samples.dremio.com", "analytics", "get_high_fares"]
-  is_scalar = false
-  
-  function_arg_list = [
-    {
-      name      = "min_fare"
-      data_type = "DOUBLE"
-    }
-  ]
-  
-  function_body = <<-EOT
+  path              = ["Samples", "samples.dremio.com", "analytics", "get_high_fares"]
+  is_scalar         = false
+  function_arg_list = "min_fare DOUBLE"
+  function_body     = <<-EOT
     SELECT *
     FROM "NYC-taxi-trips"
     WHERE fare_amount > min_fare
   EOT
-  
-  return_type = {
-    data_type = "TABLE"
-  }
+  return_type       = "pickup_datetime TIMESTAMP, fare_amount DOUBLE, trip_distance DOUBLE"
 }
 ```
 

@@ -28,24 +28,37 @@ resource "dremio_engine_rule_set" "routing" {
 
 ## Schema
 
-### Required
+### Optional
 
-- `rule_infos` (List of Object) - Ordered list of routing rules. Rules are evaluated in order.
-  - `name` (String) - User-defined name for the rule.
-  - `condition` (String) - SQL-like condition for matching queries.
-  - `action` (String) - Action when condition matches. Valid values: `ROUTE`, `REJECT`.
-  - `engine_name` (String) - Name of engine to route to (required for `ROUTE` action).
-  - `reject_message` (String) - Message shown when rejecting (optional for `REJECT` action).
+#### rule_infos (List of Object)
+
+Ordered list of routing rules. Rules are evaluated in order; first match wins. When adding rules, include all existing rules you want to retain; otherwise, they will be deleted.
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | String | Yes | User-defined name for the rule. |
+| `condition` | String | No | Routing condition using SQL-like syntax. See Rule Conditions below. If not specified, always matches. |
+| `action` | String | Yes | Rule action. Valid values: `ROUTE` (route to engine), `REJECT` (reject the query). |
+| `engine_name` | String | No | Name of the engine to route jobs to. Required when `action` is `ROUTE`. Must be empty when `action` is `REJECT`. |
+| `reject_message` | String | No | Message displayed to the user if the rule rejects jobs. Only applicable when `action` is `REJECT`. |
+
+#### tag (String) - Optional
+
+UUID of a tag that routes JDBC queries to a particular session. When the JDBC connection property `ROUTING_TAG` is set, the specified tag value is associated with all queries executed within that connection's session.
 
 ### Read-Only
 
-- `rule_info_default` (Object) - The default rule applied when no other rules match.
-  - `name` (String) - Rule name.
-  - `condition` (String) - Condition (always matches for default).
-  - `engine_name` (String) - Default engine name.
-  - `action` (String) - Action (always `ROUTE` for default).
-  - `reject_message` (String) - Not applicable for default rule.
-- `tag` (String) - Version tag for optimistic concurrency control.
+#### rule_info_default (Object)
+
+The default rule that applies to jobs without a matching rule. This rule cannot be deleted and is computed from the API.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `name` | String | Rule name. |
+| `condition` | String | Condition (always matches for default). |
+| `engine_name` | String | Name of the default engine. |
+| `action` | String | Action (always `ROUTE` for default). |
+| `reject_message` | String | Not applicable for default rule. |
 
 ## Import
 
